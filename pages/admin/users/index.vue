@@ -2,7 +2,9 @@
     <v-row>
         <v-col md="12">
             <v-card>
-                <v-card-title>Gestion des utilisateurs</v-card-title>
+                <v-card-title>
+                    Users management
+                </v-card-title>
             </v-card>
         </v-col>
     </v-row>

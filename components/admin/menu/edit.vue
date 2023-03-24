@@ -3,42 +3,42 @@
         v-model="data.dialog"
         width="800"
         transition="dialog-bottom-transition"
+        :persistent="data.loading"
     >
         <template v-slot:activator="{ props }">
             <v-btn
-                class="float-right"
-                color="success"
-                v-bind="props"
+                color="primary"
                 variant="text"
+                v-bind="props"
+                class="float-right"
             >
-                <v-icon>mdi-plus</v-icon>
-                <span v-if="props.isIcon">&nbsp;Add</span>
+                <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </template>
 
         <v-card :loading="data.loading">
-            <v-toolbar color="success" class="pl-2"><v-icon>mdi-plus</v-icon>&nbsp;Add new menu</v-toolbar>
+            <v-toolbar color="primary"><span class="ml-4">Edit</span></v-toolbar>
 
             <v-card-text>
                 <v-row>
                     <v-col md="6">
                         <v-text-field
                             label="Name"
-                            v-model="data.entity.name"
+                            v-model="menu.name"
                         ></v-text-field>
                     </v-col>
 
                     <v-col md="6">
                         <v-text-field
                             label="Slug"
-                            v-model="data.entity.slug"
+                            v-model="menu.slug"
                         ></v-text-field>
                     </v-col>
 
                     <v-col md="6">
                         <v-text-field
                             label="Type"
-                            v-model="data.entity.type"
+                            v-model="menu.type"
                         ></v-text-field>
                     </v-col>
 
@@ -46,7 +46,7 @@
                         <v-text-field
                             label="Position"
                             type="number"
-                            v-model="data.entity.position"
+                            v-model="menu.position"
                         ></v-text-field>
                     </v-col>
 
@@ -54,16 +54,30 @@
                         <v-select
                             label="Page"
                             :items="pages"
-                            v-model="data.entity.pageUuid"
+                            v-model="menu.pageUuid"
                         ></v-select>
                     </v-col>
                 </v-row>
             </v-card-text>
 
             <v-card-actions>
-                <v-btn color="error" @click="data.dialog = false" :disabled="data.loading">Close</v-btn>
+                <v-btn
+                    color="error"
+                    variant="text"
+                    @click="data.dialog = false"
+                >
+                    Abort
+                </v-btn>
+
                 <v-spacer></v-spacer>
-                <v-btn color="success" @click="add" :disabled="data.loading" :loading="data.loading">Add</v-btn>
+
+                <v-btn
+                    color="primary"
+                    variant="text"
+                    @click="edit"
+                >
+                    Edit
+                </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -75,22 +89,14 @@ import { useToast } from 'vue-toastification';
 const emit = defineEmits(['updated']);
 
 const props = defineProps({
-    isIcon: {
-        type: Boolean,
-        default: true,
+    menu: {
+        type: Object
     }
 });
 
 let data = reactive({
     dialog: false,
     loading: false,
-    entity: {
-        name: '',
-        type: '',
-        slug: '',
-        position: 0,
-        pageUuid: null,
-    }
 });
 
 const { data: pagesFromApi } = await useFetch(`/api/admin/pages/`);
@@ -104,17 +110,17 @@ const pages = computed(() => {
     });
 });
 
-async function add() {
+async function edit() {
     data.loading = true;
 
-    const { data: message } = await useFetch(`/api/admin/menu/`, {
-        method: 'post',
+    await useFetch(`/api/admin/menu/${props.menu.uuid}`, {
+        method: 'put',
         body: {
-            name: data.entity.name,
-            type: data.entity.type,
-            slug: data.entity.slug,
-            position: parseInt(data.entity.position),
-            pageUuid: data.entity.pageUuid
+            name: props.menu.name,
+            type: props.menu.type,
+            slug: props.menu.slug,
+            position: parseInt(props.menu.position),
+            pageUuid: props.menu.pageUuid
         },
         onResponse({ request, response, options }) {
             if (response.status === 200) {
