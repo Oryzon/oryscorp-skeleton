@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:root@localhost:3306/skeleton"
+}
+
+model Setting {
+  uuid String @id @default(uuid())
+  key String
+  value String
+  createdAt DateTime @default(now())
+  createdBy String
+  updatedAt DateTime @updatedAt
+  updatedBy String
+}
+
+model Menu {
+  uuid      String @id @default(uuid())
+  type      String
+  name      String
+  slug      String
+  position  Int @default(0)
+  page      Page? @relation(fields: [pageUuid], references: [uuid])
+  pageUuid  String?
+  createdAt DateTime @default(now())
+  createdBy String
+  updatedAt DateTime @updatedAt
+  updatedBy String
+  deletedAt DateTime?
+  deletedBy String?
+}
+
+model Page {
+  uuid    String @id @default(uuid())
+  title   String
+  content String?
+  state   Boolean @default(false)
+  createdAt DateTime @default(now())
+  createdBy String
+  updatedAt DateTime @updatedAt
+  updatedBy String
+  deletedAt DateTime?
+  deletedBy String?
+  menus Menu[]
+}
+
+model User {
+  uuid String @id @default(uuid())
+  email String @unique
+  password String
+  username String?
+  createdAt DateTime @default(now())
+}
