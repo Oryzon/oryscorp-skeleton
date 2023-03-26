@@ -26,11 +26,9 @@
 
         <v-footer app>
             <v-row justify="center" no-gutters>
-                <v-col md="12" class="mb-4">
-                    <v-divider></v-divider>
-                </v-col>
 
-                <v-col class="text-center mb-2">
+
+                <v-col class="text-center mb-2 mt-2">
                     {{ new Date().getFullYear() }} — <strong>Administration - {{ title.value }}</strong>
                 </v-col>
             </v-row>
@@ -64,6 +62,12 @@ const menus = [
         icon: 'mdi-account-key',
         color: 'deep-orange-accent-4',
         to: '/admin/users',
+    },
+    {
+        title: 'Settings',
+        icon: 'mdi-cog',
+        color: 'teal-darken-1',
+        to: '/admin/settings'
     }
 ];
 </script>

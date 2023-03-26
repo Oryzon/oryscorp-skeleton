@@ -122,12 +122,12 @@ async function edit() {
             position: parseInt(props.menu.position),
             pageUuid: props.menu.pageUuid
         },
-        onResponse({ request, response, options }) {
+        onResponse({ response }) {
             if (response.status === 200) {
                 useToast().success(response._data.message);
             }
         },
-        onResponseError({ request, response, options }) {
+        onResponseError({ response }) {
             useToast().error(response._data.message);
         }
     });
