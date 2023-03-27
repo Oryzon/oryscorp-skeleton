@@ -3,7 +3,7 @@
         v-model="data.dialog"
         width="800"
         transition="dialog-bottom-transition"
-        :persistent="data.loading"
+        :persistent="pending"
     >
         <template v-slot:activator="{ props }">
             <v-btn
@@ -16,7 +16,7 @@
             </v-btn>
         </template>
 
-        <v-card :loading="data.loading">
+        <v-card :loading="pending">
             <v-toolbar color="primary"><span class="ml-4">Edit</span></v-toolbar>
 
             <v-card-text>
@@ -65,6 +65,8 @@
                     color="error"
                     variant="text"
                     @click="data.dialog = false"
+                    :loading="pending"
+                    :disabled="pending"
                 >
                     Abort
                 </v-btn>
@@ -75,6 +77,8 @@
                     color="primary"
                     variant="text"
                     @click="edit"
+                    :loading="pending"
+                    :disabled="pending"
                 >
                     Edit
                 </v-btn>
@@ -96,10 +100,9 @@ const props = defineProps({
 
 let data = reactive({
     dialog: false,
-    loading: false,
 });
 
-const { data: pagesFromApi } = await useFetch(`/api/admin/pages/`);
+const { data: pagesFromApi, pending } = await useFetch(`/api/admin/pages/`);
 
 const pages = computed(() => {
     return pagesFromApi.value.map((page) => {
@@ -111,9 +114,7 @@ const pages = computed(() => {
 });
 
 async function edit() {
-    data.loading = true;
-
-    await useFetch(`/api/admin/menu/${props.menu.uuid}`, {
+    const { data: pending } = await useFetch(`/api/admin/menu/${props.menu.uuid}`, {
         method: 'put',
         body: {
             name: props.menu.name,
@@ -134,7 +135,6 @@ async function edit() {
 
     emit('updated');
 
-    data.loading = false;
     data.dialog = false;
 }
 </script>

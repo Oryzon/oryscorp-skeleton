@@ -68,9 +68,9 @@
 
 <script setup>
 import { useToast } from "vue-toastification";
-import { useCookie, useRouter} from "#app";
+import { useCookie, useRouter, useState } from "#app";
 
-const { data: title } = await useFetch('/api/public/setting/title');
+const { data: title, refresh } = await useFetch('/api/public/setting/title');
 const menus = [
     {
         title: 'Dashboard',
@@ -103,10 +103,16 @@ const menus = [
         to: '/admin/settings'
     }
 ];
-
 const menu = ref(false);
 
 const auth = useCookie('auth');
+
+const needRefresh = useState('need-refresh', () => false);
+
+watch(needRefresh, () => {
+    refresh();
+    needRefresh.value = false;
+});
 
 // We don't have a cookie, so the user is not authentificated.
 if (!auth.value) {

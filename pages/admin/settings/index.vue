@@ -34,13 +34,12 @@
 
 <script setup>
 import { useToast } from "vue-toastification";
+import { useState } from "#app";
 
 definePageMeta({
     layout: "admin",
 });
 
-
-let loading = ref(true);
 const { data: settings, refresh, pending } = await useFetch(`/api/admin/setting/`);
 
 const title = computed({
@@ -64,7 +63,7 @@ const canRegister = computed({
     set(newValue) {
         const tmp = settings.value.find((setting) => setting.key === 'canRegister');
         tmp
-            ? tmp.value = newValue
+            ? tmp.value = newValue === true ? '1' : '0'
             : newValue;
     }
 });
@@ -75,6 +74,16 @@ async function update() {
         body: {
             title: title.value,
             canRegister: canRegister.value ? '1' : '0'
+        },
+        onResponse({ response }) {
+            if (response.status === 200) {
+                useToast().success(response._data.message);
+                useState('need-refresh').value = true;
+                refresh();
+            }
+        },
+        onResponseError({ response }) {
+            useToast().error(response._data.message);
         }
     });
 }

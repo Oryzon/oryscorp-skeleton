@@ -1,13 +1,22 @@
 import prisma from "~/prisma/client";
 import { jwtCheckerHelper } from "~/server/helper/jwt-checker.helper";
+import { H3Event, getQuery } from "h3";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event: H3Event) => {
     let user = await jwtCheckerHelper(event);
+    const query = getQuery(event)
+    let limit = typeof query.limit === "string" ? parseInt(query.limit) : 2;
+    let page = typeof query.page === "string" ? parseInt(query.page) : 1;
 
-    return prisma.menu.findMany({
-        orderBy: [
-            { type: 'desc' },
-            { position: 'asc' }
-        ]
-    });
+    return {
+        count: await prisma.menu.count(),
+        items: await prisma.menu.findMany({
+            take: limit,
+            skip: (page - 1) * limit,
+            orderBy: [
+                { type: 'desc' },
+                { position: 'asc' }
+            ]
+        })
+    };
 });

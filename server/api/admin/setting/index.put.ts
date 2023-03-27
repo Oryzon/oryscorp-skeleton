@@ -10,23 +10,24 @@ export default defineEventHandler(async (event) => {
     if (user) {
         let settings = await prisma.setting.findMany();
 
-        settings = settings.map((setting) => {
-            if (setting.key === 'title') {
+        for (let setting of settings) {
+            if (setting.key === 'title' && setting.value !== body.title) {
                 setting.value = body.title;
                 setting.updatedBy = user.uuid;
             }
 
-            if (setting.key === 'canRegister') {
+            if (setting.key === 'canRegister' && setting.value !== body.canRegister) {
                 setting.value = body.canRegister;
                 setting.updatedBy = user.uuid;
             }
 
-            return setting;
-        });
-
-        await prisma.setting.updateMany({
-            data: settings
-        });
+            await prisma.setting.update({
+                where: {
+                    uuid: setting.uuid
+                },
+                data: setting
+            })
+        }
 
         return SETTING_SAVED;
     }

@@ -16,7 +16,7 @@
             </v-btn>
         </template>
 
-        <v-card :loading="data.loading">
+        <v-card :loading="pending">
             <v-toolbar color="success" class="pl-2"><v-icon>mdi-plus</v-icon>&nbsp;Add new menu</v-toolbar>
 
             <v-card-text>
@@ -61,9 +61,9 @@
             </v-card-text>
 
             <v-card-actions>
-                <v-btn color="error" @click="data.dialog = false" :disabled="data.loading">Close</v-btn>
+                <v-btn color="error" @click="data.dialog = false" :disabled="pending">Close</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="success" @click="add" :disabled="data.loading" :loading="data.loading">Add</v-btn>
+                <v-btn color="success" @click="add" :disabled="pending" :loading="pending">Add</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -83,7 +83,6 @@ const props = defineProps({
 
 let data = reactive({
     dialog: false,
-    loading: false,
     entity: {
         name: '',
         type: '',
@@ -93,7 +92,7 @@ let data = reactive({
     }
 });
 
-const { data: pagesFromApi } = await useFetch(`/api/admin/pages/`);
+const { data: pagesFromApi, pending } = await useFetch(`/api/admin/pages/`);
 
 const pages = computed(() => {
     return pagesFromApi.value.map((page) => {
@@ -105,9 +104,7 @@ const pages = computed(() => {
 });
 
 async function add() {
-    data.loading = true;
-
-    const { data: message } = await useFetch(`/api/admin/menu/`, {
+    const { data: message, pending } = await useFetch(`/api/admin/menu/`, {
         method: 'post',
         body: {
             name: data.entity.name,
@@ -116,19 +113,18 @@ async function add() {
             position: parseInt(data.entity.position),
             pageUuid: data.entity.pageUuid
         },
-        onResponse({ request, response, options }) {
+        onResponse({ response }) {
             if (response.status === 200) {
                 useToast().success(response._data.message);
             }
         },
-        onResponseError({ request, response, options }) {
+        onResponseError({ response }) {
             useToast().error(response._data.message);
         }
     });
 
     emit('updated');
 
-    data.loading = false;
     data.dialog = false;
 }
 </script>
