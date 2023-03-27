@@ -98,6 +98,6 @@ async function register() {
                 useRouter().push({ path: '/' });
             }
         }
-    })
+    });
 }
 </script>

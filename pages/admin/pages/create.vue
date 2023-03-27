@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col md="12">
-            <v-card :loading="data.loading">
+            <v-card :loading="pending">
                 <v-card-title>Create a new page</v-card-title>
 
                 <v-card-text>
@@ -34,9 +34,9 @@
                 </v-card-text>
 
                 <v-card-actions>
-                    <v-btn color="error" text :disabled="data.loading">Abort</v-btn>
+                    <v-btn color="error" text :disabled="pending">Abort</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn color="success" text :disabled="data.loading" :loading="data.loading" @click="add">Create</v-btn>
+                    <v-btn color="success" text :disabled="pending" :loading="pending" @click="add">Create</v-btn>
                 </v-card-actions>
             </v-card>
         </v-col>
@@ -45,14 +45,16 @@
 
 <script setup>
 import { useToast } from "vue-toastification";
+import { useRouter } from "#app";
 
 definePageMeta({
     layout: "admin",
 });
 
+const pending = ref(false);
+
 let data = reactive({
     dialog: false,
-    loading: false,
     entity: {
         title: '',
         content: '',
@@ -61,9 +63,7 @@ let data = reactive({
 });
 
 async function add() {
-    data.loading = true;
-
-     await useFetch(`/api/admin/pages/`, {
+     const { data: pending } = await useFetch(`/api/admin/pages/`, {
         method: 'post',
         body: {
             title: data.entity.title,
@@ -73,6 +73,7 @@ async function add() {
         onResponse({ request, response, options }) {
             if (response.status === 200) {
                 useToast().success(response._data.message);
+                useRouter().push({path: '/admin/pages'});
             }
         },
         onResponseError({ request, response, options }) {
@@ -80,7 +81,6 @@ async function add() {
         }
     });
 
-    data.loading = false;
     data.dialog = false;
 }
 

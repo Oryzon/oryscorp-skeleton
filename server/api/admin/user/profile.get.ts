@@ -4,9 +4,10 @@ import { jwtCheckerHelper } from "~/server/helper/jwt-checker.helper";
 export default defineEventHandler(async (event) => {
     let user = await jwtCheckerHelper(event);
 
-    return prisma.page.findMany({
-        orderBy: [
-            { createdAt: 'desc' },
-        ]
-    });
+    return {
+        uuid: user?.uuid,
+        username: user?.username,
+        email: user?.email,
+        createdAt: user?.createdAt,
+    }
 });

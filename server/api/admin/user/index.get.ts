@@ -4,7 +4,7 @@ import { jwtCheckerHelper } from "~/server/helper/jwt-checker.helper";
 export default defineEventHandler(async (event) => {
     let user = await jwtCheckerHelper(event);
 
-    return prisma.page.findMany({
+    return prisma.user.findMany({
         orderBy: [
             { createdAt: 'desc' },
         ]

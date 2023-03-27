@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col md="12">
-            <v-card>
+            <v-card :loading="pending">
                 <v-card-title>
                     Menu management
 
@@ -29,7 +29,7 @@
                                         <td>{{ menu.name }}</td>
                                         <td>{{ menu.slug }}</td>
                                         <td>{{ menu.position }}</td>
-                                        <td>{{ menu.pageUuid }}</td>
+                                        <td>{{ menu.pageUuid ? menu.pageUuid : 'System' }}</td>
                                         <td>{{ fDateTime(menu.updatedAt ? menu.updatedAt : menu.createdAt) }}</td>
                                         <td>
                                             <ComponentsAdminMenuDelete
@@ -63,5 +63,5 @@ definePageMeta({
     layout: "admin",
 });
 
-const { data: menus, refresh } = await useFetch(`/api/admin/menu/`);
+const { data: menus, refresh, pending } = await useFetch(`/api/admin/menu/`);
 </script>

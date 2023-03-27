@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col md="12">
-            <v-card>
+            <v-card :loading="pending">
                 <v-card-title>
                     Pages management
 
@@ -49,5 +49,5 @@ definePageMeta({
     layout: "admin",
 });
 
-const { data: pages, refresh } = await useFetch(`/api/admin/pages/`);
+const { data: pages, refresh, pending } = await useFetch(`/api/admin/pages/`);
 </script>
