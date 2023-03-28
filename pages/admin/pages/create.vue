@@ -9,14 +9,14 @@
                         <v-col md="12">
                             <v-text-field
                                 label="Title"
-                                v-model="data.entity.title"
+                                v-model="entity.title"
                             ></v-text-field>
                         </v-col>
 
                         <v-col md="12" class="mt-n6">
                             <v-textarea
                                 label="Content"
-                                v-model="data.entity.content"
+                                v-model="entity.content"
                             ></v-textarea>
                         </v-col>
 
@@ -27,7 +27,7 @@
                                     {title: 'Activated', value: 1},
                                     {title: 'Desactivated', value: 0},
                                 ]"
-                                v-model="data.entity.state"
+                                v-model="entity.state"
                             ></v-select>
                         </v-col>
                     </v-row>
@@ -44,44 +44,45 @@
 </template>
 
 <script setup>
-import { useToast } from "vue-toastification";
-import { useRouter } from "#app";
-
 definePageMeta({
     layout: "admin",
 });
+</script>
 
-const pending = ref(false);
+<script>
+import { useToast } from "vue-toastification";
+import { useRouter } from "#app";
+import axios from "axios";
 
-let data = reactive({
-    dialog: false,
-    entity: {
-        title: '',
-        content: '',
-        state: '',
-    }
-});
-
-async function add() {
-     const { data: pending } = await useFetch(`/api/admin/pages/`, {
-        method: 'post',
-        body: {
-            title: data.entity.title,
-            content: data.entity.content,
-            state: parseInt(data.entity.state)
-        },
-        onResponse({ request, response, options }) {
-            if (response.status === 200) {
-                useToast().success(response._data.message);
-                useRouter().push({path: '/admin/pages'});
-            }
-        },
-        onResponseError({ request, response, options }) {
-            useToast().error(response._data.message);
+export default {
+    data() {
+        return {
+            dialog: false,
+            entity: {
+                title: '',
+                content: '',
+                state: '',
+            },
+            pending: false,
         }
-    });
+    },
+    methods: {
+        async add() {
+            this.pending = true;
 
-    data.dialog = false;
+            await axios.post(`/api/admin/pages`, {
+                title: this.entity.title,
+                content: this.entity.content,
+                state: parseInt(this.entity.state)
+            }).then((res) => {
+                useToast().success(res.data.message);
+                useRouter().push({path: '/admin/pages'});
+            }).catch((err) => {
+
+            }).finally(() => {
+                this.pending = false;
+            });
+        }
+    }
 }
-
 </script>

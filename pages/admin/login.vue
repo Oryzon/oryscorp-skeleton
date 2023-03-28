@@ -1,7 +1,7 @@
 <template>
     <v-row justify="center" align="center">
         <v-col md="6">
-            <v-card>
+            <v-card :loading="pending">
                 <v-card-text>
                     <v-row>
                         <v-col md="12">
@@ -26,9 +26,9 @@
                 </v-card-text>
 
                 <v-card-actions>
-                    <v-btn color="error" variant="text" @click="reset">Reset</v-btn>
+                    <v-btn color="error" variant="text" @click="reset" :disabled="pending">Reset</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn color="success" variant="text" @click="login">Login</v-btn>
+                    <v-btn color="success" variant="text" @click="login" :loading="pending" :disabled="pending">Login</v-btn>
                 </v-card-actions>
             </v-card>
         </v-col>
@@ -36,48 +36,47 @@
 </template>
 
 <script setup>
-import { useToast } from "vue-toastification";
-import { useCookie, useRouter } from "#app";
-
 definePageMeta({
     layout: "no-layout",
 });
+</script>
 
-const user = reactive({username: '', password: ''});
-let loading = ref(false);
+<script>
+import { useToast } from "vue-toastification";
+import { useCookie, useRouter } from "#app";
+import axios from "axios";
+import { useErrorStore } from "~/store/error.store";
+import { useAuthStore } from "~/store/auth.store";
 
-function reset() {
-    user.username = '';
-    user.password = '';
-}
-
-async function login() {
-    loading = true;
-
-    await useFetch(`/api/admin/auth/login`, {
-        method: 'post',
-        body: {
-            username: user.username,
-            password: user.password
-        },
-        onResponse({ response }) {
-            if (response.status === 200) {
-                const auth = useCookie('auth');
-                auth.value = response._data.token;
-
-                useToast().success('Welcome back ');
-                useRouter().push({path: '/admin/'});
-            }
-
-            loading = false;
-        },
-        onResponseError({ response }) {
-            if (response.status === 401) {
-                useToast().error(response._data.message);
-                user.password = '';
-            }
+export default {
+    data() {
+        return {
+            user: {
+                username: '',
+                password: '',
+            },
+            pending: false,
         }
-    })
+    },
+    methods: {
+        reset() {
+            this.user.username = '';
+            this.user.password = '';
+        },
+        async login() {
+            this.pending = true;
 
+            await axios.post(`/api/admin/auth/login`, {
+                username: this.user.username,
+                password: this.user.password
+            }).then((res) => {
+                useAuthStore().login(res);
+            }).catch((err) => {
+                useErrorStore().handle(err);
+            }).finally(() => {
+                this.pending = false;
+            });
+        }
+    }
 }
 </script>

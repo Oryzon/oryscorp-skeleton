@@ -25,17 +25,17 @@ export const jwtCheckerHelper = async (event: H3Event) => {
     } catch (err: any) {
         console.log(err);
 
-        if (err instanceof jwt.JsonWebTokenError) {
-            throw createError({
-                statusCode: 401,
-                statusMessage: USER_NOT_FOUND
-            });
-        }
-
         if (err instanceof jwt.TokenExpiredError) {
             throw createError({
                 statusCode: 401,
                 statusMessage: JWT_TOKEN_EXPIRED
+            });
+        }
+
+        if (err instanceof jwt.JsonWebTokenError) {
+            throw createError({
+                statusCode: 401,
+                statusMessage: USER_NOT_FOUND
             });
         }
 

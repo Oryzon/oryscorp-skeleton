@@ -66,74 +66,87 @@
     </v-app>
 </template>
 
-<script setup>
+<script>
 import { useToast } from "vue-toastification";
 import { useCookie, useRouter, useState } from "#app";
+import { useErrorStore } from "~/store/error.store";
+import { useAuthStore } from "~/store/auth.store";
 
-const { data: title, refresh } = await useFetch('/api/public/setting/title');
-const menus = [
-    {
-        title: 'Dashboard',
-        icon: 'mdi-view-dashboard',
-        color: 'cyan-accent-3',
-        to: '/admin/'
+export default {
+    setup() {
+        const needRefresh = useState('need-refresh', () => false);
+
+        const { data: title, refresh } = useFetch('/api/public/setting/title');
+        useAuthStore().refresh();
+
+        return {
+            needRefresh,
+            title,
+            refresh
+        }
     },
-    {
-        title: 'Pages',
-        icon: 'mdi-book-open-page-variant',
-        color: 'purple-accent-4',
-        to: '/admin/pages',
+    data() {
+        return {
+            menus: [
+                {
+                    title: 'Dashboard',
+                    icon: 'mdi-view-dashboard',
+                    color: 'cyan-accent-3',
+                    to: '/admin/'
+                },
+                {
+                    title: 'Pages',
+                    icon: 'mdi-book-open-page-variant',
+                    color: 'purple-accent-4',
+                    to: '/admin/pages',
+                },
+                {
+                    title: 'Menus',
+                    icon: 'mdi-menu',
+                    color: 'green-darken-2',
+                    to: '/admin/menus',
+                },
+                {
+                    title: 'Users',
+                    icon: 'mdi-account-key',
+                    color: 'deep-orange-accent-4',
+                    to: '/admin/users',
+                },
+                {
+                    title: 'Settings',
+                    icon: 'mdi-cog',
+                    color: 'teal-darken-1',
+                    to: '/admin/settings'
+                }
+            ],
+            menu: false,
+        }
     },
-    {
-        title: 'Menus',
-        icon: 'mdi-menu',
-        color: 'green-darken-2',
-        to: '/admin/menus',
+    async mounted() {
+        await this.getInit();
     },
-    {
-        title: 'Users',
-        icon: 'mdi-account-key',
-        color: 'deep-orange-accent-4',
-        to: '/admin/users',
+    methods: {
+        async getInit() {
+
+        },
+        logout() {
+
+        }
     },
-    {
-        title: 'Settings',
-        icon: 'mdi-cog',
-        color: 'teal-darken-1',
-        to: '/admin/settings'
-    }
-];
-const menu = ref(false);
-
-const auth = useCookie('auth');
-
-const needRefresh = useState('need-refresh', () => false);
-
-watch(needRefresh, () => {
-    refresh();
-    needRefresh.value = false;
-});
-
-// We don't have a cookie, so the user is not authentificated.
-if (!auth.value) {
-    useToast().error('You need to be authentificated to access this part.');
-    await useRouter().push({path: '/admin/login'});
-}
-
-const { data: user } = await useFetch(`/api/admin/user/profile`, {
-    onResponseError({ response }) {
-        useToast().error(response._data.message);
-
-        if (response.status === 401) {
-            useRouter().push({ path: '/admin/login' });
+    computed: {
+        isAuthentificated() {
+            return true;
+        },
+        user() {
+            return useAuthStore().getUser;
+        }
+    },
+    watch: {
+        needRefresh(newVal) {
+            if (newVal) {
+                this.refresh();
+            }
         }
     }
-});
-
-function logout() {
-    auth.value = null;
-    useRouter().push({ path: '/admin/login' });
-    useToast().success('See you later !');
 }
-
 </script>

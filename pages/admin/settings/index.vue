@@ -32,60 +32,79 @@
     </v-row>
 </template>
 
-<script setup>
+<script>
 import { useToast } from "vue-toastification";
 import { useState } from "#app";
+import axios from "axios";
 
-definePageMeta({
-    layout: "admin",
-});
-
-const { data: settings, refresh, pending } = await useFetch(`/api/admin/setting/`);
-
-const title = computed({
-    get() {
-        const tmp = settings.value.find((setting) => setting.key === 'title');
-        return tmp ? tmp.value : '';
+export default {
+    setup() {
+        definePageMeta({
+            layout: "admin",
+        });
     },
-    set(newValue) {
-        const tmp = settings.value.find((setting) => setting.key === 'title');
-        tmp
-            ? tmp.value = newValue
-            : newValue;
-    }
-});
-
-const canRegister = computed({
-    get() {
-        const tmp = settings.value.find((setting) => setting.key === 'canRegister');
-        return tmp ? tmp.value === '1' : false;
+    data() {
+        return {
+            pending: false,
+            settings: [],
+        }
     },
-    set(newValue) {
-        const tmp = settings.value.find((setting) => setting.key === 'canRegister');
-        tmp
-            ? tmp.value = newValue === true ? '1' : '0'
-            : newValue;
-    }
-});
+    async mounted() {
+        await this.getInit();
+    },
+    methods: {
+        async getInit() {
+            this.pending = true;
 
-async function update() {
-    const { data: pending } = await useFetch(`/api/admin/setting`, {
-        method: 'put',
-        body: {
-            title: title.value,
-            canRegister: canRegister.value ? '1' : '0'
+            await axios.get(`/api/admin/setting/`).then((res) => {
+                this.settings = res.data;
+            }).catch((err) => {
+
+            }).finally(() => {
+                this.pending = false;
+            });
         },
-        onResponse({ response }) {
-            if (response.status === 200) {
-                useToast().success(response._data.message);
+        async update() {
+            this.pending = true;
+
+            await axios.put(`/api/admin/setting`, {
+                title: this.title,
+                canRegister: this.canRegister ? '1' : '0'
+            }).then((res) => {
+                useToast().success(res.data.message);
                 useState('need-refresh').value = true;
-                refresh();
+                this.refresh();
+            }).catch((err) => {
+
+            }).finally(() => {
+                this.pending = false;
+            });
+        }
+    },
+    computed: {
+        title: {
+            get() {
+                const tmp = this.settings.find((setting) => setting.key === 'title');
+                return tmp ? tmp.value : '';
+            },
+            set(newValue) {
+                const tmp = this.settings.find((setting) => setting.key === 'title');
+
+                tmp ? tmp.value = newValue : newValue;
             }
         },
-        onResponseError({ response }) {
-            useToast().error(response._data.message);
+        canRegister: {
+            get() {
+                const tmp = this.settings.find((setting) => setting.key === 'canRegister');
+                return tmp ? tmp.value === '1' : false;
+            },
+            set(newValue) {
+                const tmp = this.settings.find((setting) => setting.key === 'canRegister');
+                tmp
+                    ? tmp.value = newValue === true ? '1' : '0'
+                    : newValue;
+            }
         }
-    });
+    },
 }
-
 </script>

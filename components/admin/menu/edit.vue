@@ -1,6 +1,6 @@
 <template>
     <v-dialog
-        v-model="data.dialog"
+        v-model="dialog"
         width="800"
         transition="dialog-bottom-transition"
         :persistent="pending"
@@ -87,54 +87,55 @@
     </v-dialog>
 </template>
 
-<script setup>
+<script>
 import { useToast } from 'vue-toastification';
+import axios from "axios";
 
-const emit = defineEmits(['updated']);
-
-const props = defineProps({
-    menu: {
-        type: Object
-    }
-});
-
-let data = reactive({
-    dialog: false,
-});
-
-const { data: pagesFromApi, pending } = await useFetch(`/api/admin/pages/`);
-
-const pages = computed(() => {
-    return pagesFromApi.value.map((page) => {
+export default {
+    data() {
         return {
-            title: `${page.title} - ${page.state ? 'Activated' : 'Desactivated'}`,
-            value: page.uuid
+            dialog: false,
+            pending: false,
+            pagesFromApi: [],
         }
-    });
-});
-
-async function edit() {
-    const { data: pending } = await useFetch(`/api/admin/menu/${props.menu.uuid}`, {
-        method: 'put',
-        body: {
-            name: props.menu.name,
-            type: props.menu.type,
-            slug: props.menu.slug,
-            position: parseInt(props.menu.position),
-            pageUuid: props.menu.pageUuid
-        },
-        onResponse({ response }) {
-            if (response.status === 200) {
-                useToast().success(response._data.message);
-            }
-        },
-        onResponseError({ response }) {
-            useToast().error(response._data.message);
+    },
+    props: {
+        menu: {
+            type: Object
         }
-    });
+    },
+    methods: {
+        async edit() {
+            this.pending = true;
 
-    emit('updated');
+            await axios.put(`/api/admin/menu/${this.menu.uuid}`, {
+                name: this.menu.name,
+                type: this.menu.type,
+                slug: this.menu.slug,
+                position: parseInt(this.menu.position),
+                pageUuid: this.menu.pageUuid
+            }).then((res) => {
+                useToast().success(res.data.message);
+            }).catch((err) => {
 
-    data.dialog = false;
+            }).finally(() => {
+                this.pending = false;
+            });
+
+            this.$emit('updated');
+
+            this.dialog = false;
+        }
+    },
+    computed: {
+        pages() {
+            return this.pagesFromApi.map((page) => {
+                return {
+                    title: `${page.title} - ${page.state ? 'Activated' : 'Desactivated'}`,
+                    value: page.uuid
+                }
+            });
+        }
+    }
 }
 </script>

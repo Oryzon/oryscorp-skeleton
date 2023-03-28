@@ -33,16 +33,16 @@
 <script setup>
 const props = defineProps({
     page: {
-        type: String
+        type: Number
     },
     limit: {
-        type: String
+        type: Number
     },
     label: {
         type: String
     },
     length: {
-        type: String
+        type: Number
     }
 });
 
@@ -54,17 +54,17 @@ const choices = [
     { title: `100 entity per page` , value: 100 },
 ];
 
-let emit = defineEmits(['update:page', 'update:limit']);
+const emit = defineEmits(['update:page', 'update:limit']);
 
 const pageCount = computed(() => {
     return Math.ceil(props.length / props.limit);
 });
 
-function pageChange(event) {
+const pageChange = (event) => {
     emit('update:page', event);
 }
 
-function limitChange(event) {
+const limitChange = (event) => {
     emit('update:limit', event);
 }
 </script>

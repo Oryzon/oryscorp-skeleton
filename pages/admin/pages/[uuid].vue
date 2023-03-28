@@ -44,20 +44,45 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from "#app";
-import { useToast } from "vue-toastification";
-
-const route = useRoute();
-const router = useRouter();
-
 definePageMeta({
     layout: "admin",
 });
+</script>
 
-const { data: page, pending } = await useFetch(`/api/admin/pages/${route.params.uuid}`);
+<script>
+import { useRoute, useRouter } from "#app";
+import { useToast } from "vue-toastification";
+import axios from "axios";
 
-async function update() {
+export default {
+    data() {
+        return {
+            page: {
+                title: '',
+                content: '',
+                state: '',
+            },
+            pending: false,
+        }
+    },
+    async mounted() {
+        await this.getInit();
+    },
+    methods: {
+        async getInit() {
+            this.pending = true;
 
+            await axios.get(`/api/admin/pages/${this.$route.params.uuid}`).then((res) => {
+                this.page = res.data;
+            }).catch((err) => {
+
+            }).finally(() => {
+                this.pending = false;
+            })
+        },
+        async update() {
+
+        }
+    }
 }
-
 </script>

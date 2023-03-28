@@ -28,7 +28,16 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="page in data.items">
+
+                                <tr v-if="items.length === 0 && pending">
+                                    <td colspan="4" class="text-center">Loading data...</td>
+                                </tr>
+
+                                <tr v-else-if="items.length === 0">
+                                    <td colspan="4" class="text-center">There is no data.</td>
+                                </tr>
+
+                                <tr v-for="page in items">
                                     <td>{{ page.title }}</td>
                                     <td>{{ page.state }}</td>
                                     <td>{{ fDateTime(page.updatedAt ? page.updatedAt : page.createdAt) }}</td>
@@ -51,7 +60,7 @@
                     <ComponentsAdminTablePagination
                         v-model:page="page"
                         v-model:limit="limit"
-                        :length="data.count"
+                        :length="count"
                         label="page(s)"
                     ></ComponentsAdminTablePagination>
                 </v-card-text>
@@ -63,23 +72,52 @@
 <script setup>
 import { fDateTime } from "~/models/AppFilter";
 import ComponentsAdminTablePagination from '@/components/admin/table/pagination.vue';
+</script>
 
-definePageMeta({
-    layout: "admin",
-});
+<script>
+import axios from "axios";
 
-const page = ref(1);
-const limit = ref(20);
+export default {
+    setup() {
+        definePageMeta({
+            layout: "admin",
+        });
+    },
+    data() {
+        return {
+            page: 1,
+            limit: 20,
+            pending: false,
+            items: [],
+            count: 0,
+        }
+    },
+    async mounted() {
+        await this.getInit();
+    },
+    methods: {
+        async getInit() {
+            this.pending = true;
 
-const { data: data, refresh, pending } = await useFetch(() => `/api/admin/pages?page=${page.value}&limit=${limit.value}`);
+            await axios.get(`/api/admin/pages?page=${this.page}&limit=${this.limit}`).then((res) => {
+                this.items = res.data.items;
+                this.count = res.data.count;
+            }).catch((err) => {
 
-watch(page, (newVal) => {
-    page.value = newVal;
-    refresh();
-});
-
-watch(limit, (newVal) => {
-    limit.value = newVal;
-    refresh();
-});
+            }).finally(() => {
+                this.pending = false;
+            });
+        }
+    },
+    watch: {
+        async page(newVal) {
+            this.page = newVal;
+            await this.getInit();
+        },
+        async limit(newVal) {
+            this.limit = newVal;
+            await this.getInit();
+        }
+    }
+}
 </script>

@@ -5,7 +5,7 @@
                 <v-card-title>
                     Menu management
 
-                    <ComponentsAdminMenuAdd @updated="refresh"></ComponentsAdminMenuAdd>
+                    <ComponentsAdminMenuAdd @updated="getInit"></ComponentsAdminMenuAdd>
                 </v-card-title>
 
                 <v-card-text>
@@ -24,7 +24,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="menu in data.items">
+                                    <tr v-for="menu in items">
                                         <td>{{ capitalize(menu.type) }}</td>
                                         <td>{{ menu.name }}</td>
                                         <td>{{ menu.slug }}</td>
@@ -34,12 +34,12 @@
                                         <td>
                                             <ComponentsAdminMenuDelete
                                                 :menu="menu"
-                                                @updated="refresh"
+                                                @updated="getInit"
                                             ></ComponentsAdminMenuDelete>
 
                                             <ComponentsAdminMenuEdit
                                                 :menu="menu"
-                                                @updated="refresh"
+                                                @updated="getInit"
                                             ></ComponentsAdminMenuEdit>
                                         </td>
                                     </tr>
@@ -51,7 +51,7 @@
                     <ComponentsAdminTablePagination
                         v-model:page="page"
                         v-model:limit="limit"
-                        :length="data.count"
+                        :length="count"
                         label="menu(s)"
                     ></ComponentsAdminTablePagination>
                 </v-card-text>
@@ -63,26 +63,55 @@
 <script setup>
 import { fDateTime, capitalize } from "~/models/AppFilter";
 import ComponentsAdminMenuAdd from '@/components/admin/menu/add.vue';
-import ComponentsAdminMenuDelete from '@/components/admin/menu/delete.vue';
 import ComponentsAdminMenuEdit from '@/components/admin/menu/edit.vue';
+import ComponentsAdminMenuDelete from '@/components/admin/menu/delete.vue';
 import ComponentsAdminTablePagination from '@/components/admin/table/pagination.vue';
+</script>
 
-definePageMeta({
-    layout: "admin",
-});
+<script>
+import axios from "axios";
 
-const page = ref(1);
-const limit = ref(20);
+export default {
+    setup() {
+        definePageMeta({
+            layout: "admin",
+        });
+    },
+    data() {
+        return {
+            page: 1,
+            limit: 20,
+            pending: false,
+            items: [],
+            count: 0,
+        }
+    },
+    async mounted() {
+        await this.getInit();
+    },
+    methods: {
+        async getInit() {
+            this.pending = true;
 
-const { data: data, refresh, pending } = await useFetch(() => `/api/admin/menu?page=${page.value}&limit=${limit.value}`);
+            await axios.get(`/api/admin/menu?page=${this.page}&limit=${this.limit}`).then((res) => {
+                this.items = res.data.items;
+                this.count = res.data.count;
+            }).catch((err) => {
 
-watch(page, (newVal) => {
-    page.value = newVal;
-    refresh();
-});
-
-watch(limit, (newVal) => {
-    limit.value = newVal;
-    refresh();
-});
+            }).finally(() => {
+                this.pending = false;
+            });
+        }
+    },
+    watch: {
+        async page(newVal) {
+            this.page = newVal;
+            await this.getInit();
+        },
+        async limit(newVal) {
+            this.limit = newVal;
+            await this.getInit();
+        }
+    }
+}
 </script>

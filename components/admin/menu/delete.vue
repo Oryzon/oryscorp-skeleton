@@ -1,9 +1,9 @@
 <template>
     <v-dialog
-        v-model="data.dialog"
+        v-model="dialog"
         width="1000"
         transition="dialog-bottom-transition"
-        :persistent="data.loading"
+        :persistent="pending"
     >
         <template v-slot:activator="{ props }">
             <v-btn
@@ -16,7 +16,7 @@
             </v-btn>
         </template>
 
-        <v-card :loading="data.loading">
+        <v-card :loading="pending">
             <v-toolbar color="error"><span class="ml-4">Delete a menu</span></v-toolbar>
 
             <v-card-text>
@@ -25,7 +25,7 @@
                         <h4>Warning !</h4><br />
 
                         <p>You are going to delete a menu.</p>
-                        <p>You are going to delete the menu called <strong>{{ props.menu.name }}</strong>, and this action is fianl.</p>
+                        <p>You are going to delete the menu called <strong>{{ menu.name }}</strong>, and this action is final.</p>
                         <p>Are you sure you want to continue ?</p>
                     </v-col>
                 </v-row>
@@ -35,7 +35,8 @@
                 <v-btn
                     color="error"
                     variant="text"
-                    @click="data.dialog = false"
+                    @click="dialog = false"
+                    :disabled="pending"
                 >
                     No, I abort.
                 </v-btn>
@@ -46,6 +47,7 @@
                     color="success"
                     variant="text"
                     @click="remove"
+                    :loading="pending"
                 >
                     Yes, I delete.
                 </v-btn>
@@ -54,40 +56,45 @@
     </v-dialog>
 </template>
 
+<script>
+import { useToast } from "vue-toastification";
+import axios from "axios";
+
+export default {
+    data() {
+        return {
+            dialog: false,
+            pending: false,
+        }
+    },
+    props: {
+        menu: {
+            type: Object
+        }
+    },
+    methods: {
+        async remove() {
+            this.pending = true;
+
+            await axios.delete(`/api/admin/menu/${this.menu.uuid}`).then((res) => {
+                useToast().success(res.data.message);
+            }).catch((err) => {
+
+            }).finally(() => {
+                this.pending = false;
+            })
+
+            this.$emit('updated');
+            this.dialog = false;
+        }
+    }
+}
+</script>
+
 <script setup>
 import { useToast } from 'vue-toastification';
 
 const emit = defineEmits(['updated']);
 
-const props = defineProps({
-    menu: {
-        type: Object
-    }
-});
 
-let data = reactive({
-    dialog: false,
-    loading: false,
-});
-
-async function remove() {
-    data.loading = true;
-
-    await useFetch(`/api/admin/menu/${props.menu.uuid}`, {
-        method: 'delete',
-        onResponse({ request, response, options }) {
-            if (response.status === 200) {
-                useToast().success(response._data.message);
-            }
-        },
-        onResponseError({ request, response, options }) {
-            useToast().error(response._data.message);
-        }
-    });
-
-    emit('updated');
-
-    data.loading = false;
-    data.dialog = false;
-}
 </script>
