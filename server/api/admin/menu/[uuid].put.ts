@@ -29,8 +29,8 @@ export default defineEventHandler(async (event) => {
                 type: body.type,
                 position: body.position,
                 page: page,
-                createdBy: '',
-                updatedBy: ''
+                state: !!body.state,
+                updatedBy: user.uuid
             }
         });
 

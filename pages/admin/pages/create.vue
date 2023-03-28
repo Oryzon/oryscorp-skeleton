@@ -44,6 +44,9 @@
 </template>
 
 <script setup>
+import { useAdminTitle } from "~/composables/useAdminTitle";
+
+useAdminTitle('Create a page');
 definePageMeta({
     layout: "admin",
 });
@@ -53,6 +56,7 @@ definePageMeta({
 import { useToast } from "vue-toastification";
 import { useRouter } from "#app";
 import axios from "axios";
+import { useErrorStore } from "~/store/error.store";
 
 export default {
     data() {
@@ -77,8 +81,8 @@ export default {
             }).then((res) => {
                 useToast().success(res.data.message);
                 useRouter().push({path: '/admin/pages'});
-            }).catch((err) => {
-
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             });

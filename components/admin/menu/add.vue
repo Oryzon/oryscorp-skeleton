@@ -35,14 +35,14 @@
                         ></v-text-field>
                     </v-col>
 
-                    <v-col md="6">
+                    <v-col md="6" class="mt-n4">
                         <v-text-field
                             label="Type"
                             v-model="entity.type"
                         ></v-text-field>
                     </v-col>
 
-                    <v-col md="6">
+                    <v-col md="6" class="mt-n4">
                         <v-text-field
                             label="Position"
                             type="number"
@@ -50,11 +50,22 @@
                         ></v-text-field>
                     </v-col>
 
-                    <v-col md="12">
+                    <v-col md="6" class="mt-n4">
                         <v-select
                             label="Page"
                             :items="pages"
                             v-model="entity.pageUuid"
+                        ></v-select>
+                    </v-col>
+
+                    <v-col md="6" class="mt-n4">
+                        <v-select
+                            label="State"
+                            :items="[
+                                    {title: 'Activated', value: true},
+                                    {title: 'Desactivated', value: false},
+                                ]"
+                            v-model="entity.state"
                         ></v-select>
                     </v-col>
                 </v-row>
@@ -72,6 +83,7 @@
 <script>
 import axios from "axios";
 import { useToast } from "vue-toastification";
+import { useErrorStore } from "~/store/error.store";
 
 export default {
     data() {
@@ -84,6 +96,7 @@ export default {
                 slug: '',
                 position: 0,
                 pageUuid: null,
+                state: null
             },
             pagesFromApi: [],
         }
@@ -100,8 +113,8 @@ export default {
 
             await axios.get(`/api/admin/pages?limit=1000`).then((res) => {
                 this.pagesFromApi = res.data.items;
-            }).catch((err) => {
-
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             })
@@ -114,12 +127,13 @@ export default {
                 type: this.entity.type,
                 slug: this.entity.slug,
                 position: parseInt(this.entity.position),
-                pageUuid: this.entity.pageUuid
+                pageUuid: this.entity.pageUuid,
+                state: this.entity.state
             }).then((res) => {
                 useToast().success(res.data.message);
                 this.dialog = false;
-            }).catch((err) => {
-
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             });
@@ -148,6 +162,7 @@ export default {
                     slug: '',
                     position: 0,
                     pageUuid: null,
+                    state: null
                 }
             }
         }

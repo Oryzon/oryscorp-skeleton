@@ -10,7 +10,9 @@
 
 <script setup>
 import { useCookie, useState } from "#app";
+import { useAdminTitle } from "~/composables/useAdminTitle";
 
+useAdminTitle('Dashboard');
 definePageMeta({
     layout: "admin",
 });

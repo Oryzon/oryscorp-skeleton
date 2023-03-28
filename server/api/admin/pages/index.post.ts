@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
                 content: body.content,
                 state: !!body.state,
                 createdBy: user.uuid,
-                updatedBy: user.uuid
             }
         });
 

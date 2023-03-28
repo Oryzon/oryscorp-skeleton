@@ -15,10 +15,9 @@
 </template>
 
 <script setup>
-import { useRoute, useSeoMeta } from "#app";
+import { useRoute } from "#app";
+import { usePublicTitle } from "~/composables/usePublicTitle";
 const { data: item } = await useFetch(`/api/public/menu/header/${useRoute().params.slug}`);
 
-useSeoMeta({
-    title: `${item.page?.title} - Skeleton`
-})
+usePublicTitle(item.value.page.title)
 </script>

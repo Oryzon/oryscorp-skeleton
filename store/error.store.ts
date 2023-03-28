@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import { useRouter, useCookie } from "#app";
 import { useToast } from "vue-toastification";
 import { AxiosError } from "axios";
+import { useAuthStore } from "~/store/auth.store";
 
 export const useErrorStore = defineStore('error', {
     state: () => ({ error: '', hasBeenRead: true }),
@@ -17,21 +17,21 @@ export const useErrorStore = defineStore('error', {
     actions: {
         async handle(event: any) {
             if (event instanceof Response) {
-                useToast().error(event.statusText);
-
                 if (event.status === 401) {
-                    const auth = useCookie('auth');
-
-                    if (auth) {
-                        auth.value = null;
-                    }
-
-                    await useRouter().push({path: '/admin/login'});
+                    useToast().error("You've been disconnected.");
+                    await useAuthStore().logout();
+                } else {
+                    useToast().error(event.statusText);
                 }
             }
 
             if (event instanceof AxiosError) {
-                useToast().error(event.response ? event.response.statusText : '');
+                if (event.response?.status === 401) {
+                    useToast().error("You've been disconnected.");
+                    await useAuthStore().logout();
+                } else {
+                    useToast().error(event.response ? event.response.statusText : '');
+                }
             }
         },
     },

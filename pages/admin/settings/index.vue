@@ -32,9 +32,17 @@
     </v-row>
 </template>
 
+<script setup>
+import { useAdminTitle } from "~/composables/useAdminTitle";
+
+useAdminTitle('Settings management');
+</script>
+
 <script>
 import { useToast } from "vue-toastification";
 import { useState } from "#app";
+import { useErrorStore } from "~/store/error.store";
+import { useSettingStore } from "~/store/setting.store";
 import axios from "axios";
 
 export default {
@@ -59,7 +67,7 @@ export default {
             await axios.get(`/api/admin/setting/`).then((res) => {
                 this.settings = res.data;
             }).catch((err) => {
-
+                useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             });
@@ -72,10 +80,9 @@ export default {
                 canRegister: this.canRegister ? '1' : '0'
             }).then((res) => {
                 useToast().success(res.data.message);
-                useState('need-refresh').value = true;
-                this.refresh();
-            }).catch((err) => {
-
+                useSettingStore().init();
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             });

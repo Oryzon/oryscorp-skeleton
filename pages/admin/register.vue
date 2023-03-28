@@ -15,9 +15,9 @@
                             <v-text-field
                                 label="E-Mail"
                                 v-model="user.email"
-                                type="email"
                             ></v-text-field>
                         </v-col>
+                        
 
                         <v-col md="6" class="mt-n4">
                             <v-text-field
@@ -47,6 +47,63 @@
     </v-row>
 </template>
 
+<script>
+import { useToast } from "vue-toastification";
+import { useRouter } from "#app";
+import axios from "axios";
+
+export default {
+    setup() {
+        const { data: canRegister } = useFetch('/api/public/setting/canRegister');
+
+        console.log(canRegister?.value);
+
+        if (canRegister?.value.value === '0') {
+            useToast().error("You can't create an account on this website.");
+            useRouter().push({path: '/'});
+        }
+    },
+    data() {
+        return {
+            pending: false,
+            user: {
+                username: '',
+                email: '',
+                password: '',
+                confPassword: ''
+            }
+        }
+    },
+    computed: {
+        canValid() {
+            return !!(
+                this.user.username &&
+                this.user.email &&
+                this.user.password &&
+                this.user.confPassword &&
+                this.user.password === this.user.confPassword
+            );
+        }
+    },
+    methods: {
+        async register() {
+            this.pending = true;
+
+            await axios.post(`/api/admin/auth/register`, {
+                username: this.user.username,
+                email: this.user.email,
+                password: this.user.password
+            }).then((res) => {
+                useToast().success(res.data.message);
+                useRouter().push({ path: '/admin/login' });
+            }).catch((err) => {
+                useToast().error(err.response.data.message);
+            });
+        }
+    }
+}
+</script>
+
 <script setup>
 import { useToast } from "vue-toastification";
 import { useRouter } from "#app";
@@ -54,50 +111,4 @@ import { useRouter } from "#app";
 definePageMeta({
     layout: "no-layout",
 });
-
-const { data: canRegister } = await useFetch('/api/public/setting/canRegister');
-
-if (canRegister?.value.value === '0') {
-    useToast().error("You can't create an account on this website.");
-    useRouter().push({path: '/'});
-}
-
-const user = reactive({ username: '', email: '', password: '', confPassword: '' });
-let loading = reactive(false);
-
-const canValid = computed(() => {
-    return !!(
-        user.username &&
-        user.email &&
-        user.password &&
-        user.confPassword &&
-        user.password === user.confPassword
-    );
-});
-
-async function register() {
-    loading = true;
-
-    await useFetch(`/api/admin/auth/register`, {
-        method: 'post',
-        body: {
-            username: user.username,
-            email: user.email,
-            password: user.password,
-        },
-        onResponse({ response }) {
-            if (response.status === 200) {
-                useToast().success(response._data.message);
-                useRouter().push({ path: '/admin/login' });
-            }
-        },
-        onResponseError({ response }) {
-            useToast().error(response._data.message);
-
-            if (response.status === 401) {
-                useRouter().push({ path: '/' });
-            }
-        }
-    });
-}
 </script>

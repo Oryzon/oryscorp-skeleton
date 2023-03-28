@@ -17,15 +17,16 @@
         </template>
 
         <v-card :loading="pending">
-            <v-toolbar color="error"><span class="ml-4">Delete a menu</span></v-toolbar>
+            <v-toolbar color="error"><span class="ml-4">Delete a page</span></v-toolbar>
 
             <v-card-text>
                 <v-row>
                     <v-col cols="12">
                         <h4>Warning !</h4><br />
 
-                        <p>You are going to delete a menu.</p>
-                        <p>You are going to delete the menu called <strong>{{ menu.name }}</strong>, and this action is final.</p>
+                        <p>You are going to delete a page.</p>
+                        <p>You are going to delete the page called <strong>{{ page.title }}</strong>, and this action is final.</p>
+                        <p>All menu linked to this page are goind to be reset and desactivated.</p>
                         <p>Are you sure you want to continue ?</p>
                     </v-col>
                 </v-row>
@@ -69,7 +70,7 @@ export default {
         }
     },
     props: {
-        menu: {
+        page: {
             type: Object
         }
     },
@@ -77,7 +78,7 @@ export default {
         async remove() {
             this.pending = true;
 
-            await axios.delete(`/api/admin/menu/${this.menu.uuid}`).then((res) => {
+            await axios.delete(`/api/admin/pages/${this.page.uuid}`).then((res) => {
                 useToast().success(res.data.message);
             }).catch(async (err) => {
                 await useErrorStore().handle(err);

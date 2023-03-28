@@ -30,41 +30,48 @@
     </v-row>
 </template>
 
-<script setup>
-const props = defineProps({
-    page: {
-        type: Number
+<script>
+export default {
+    setup() {
+
     },
-    limit: {
-        type: Number
+    props: {
+        page: {
+            type: Number
+        },
+        limit: {
+            type: Number
+        },
+        label: {
+            type: String
+        },
+        length: {
+            type: Number
+        }
     },
-    label: {
-        type: String
+    data() {
+        return {
+            choices: [
+                { title: `20 entity per page` , value: 20 },
+                { title: `40 entity per page` , value: 40 },
+                { title: `60 entity per page` , value: 60 },
+                { title: `80 entity per page` , value: 80 },
+                { title: `100 entity per page` , value: 100 },
+            ]
+        }
     },
-    length: {
-        type: Number
+    computed: {
+        pageCount() {
+            return Math.ceil(this.length / this.limit);
+        }
+    },
+    methods: {
+        pageChange(event) {
+            this.$emit('update:page', event);
+        },
+        limitChange(event) {
+            this.$emit('update:limit', event);
+        }
     }
-});
-
-const choices = [
-    { title: `20 entity per page` , value: 20 },
-    { title: `40 entity per page` , value: 40 },
-    { title: `60 entity per page` , value: 60 },
-    { title: `80 entity per page` , value: 80 },
-    { title: `100 entity per page` , value: 100 },
-];
-
-const emit = defineEmits(['update:page', 'update:limit']);
-
-const pageCount = computed(() => {
-    return Math.ceil(props.length / props.limit);
-});
-
-const pageChange = (event) => {
-    emit('update:page', event);
-}
-
-const limitChange = (event) => {
-    emit('update:limit', event);
 }
 </script>

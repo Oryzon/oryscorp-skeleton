@@ -14,28 +14,23 @@
                                 <tr>
                                     <th>Username</th>
                                     <th>E-Mail</th>
-                                    <th>Created at</th>
-                                    <th class="text-right">Actions</th>
+                                    <th class="text-right">Created at</th>
                                 </tr>
                                 </thead>
                                 <tbody>
 
                                 <tr v-if="items.length === 0 && pending">
-                                    <td colspan="4" class="text-center">Loading data...</td>
+                                    <td colspan="3" class="text-center">Loading data...</td>
                                 </tr>
 
                                 <tr v-else-if="items.length === 0">
-                                    <td colspan="4" class="text-center">There is no data.</td>
+                                    <td colspan="3" class="text-center">There is no data.</td>
                                 </tr>
 
                                 <tr v-else v-for="user in items">
                                     <td>{{ user.username }}</td>
                                     <td>{{ user.email }}</td>
-                                    <td>{{ fDateTime(user.createdAt) }}</td>
-
-                                    <td>
-
-                                    </td>
+                                    <td class="text-right">{{ fDateTime(user.createdAt) }}</td>
                                 </tr>
                                 </tbody>
                             </v-table>
@@ -57,10 +52,14 @@
 <script setup>
 import { fDateTime } from "~/models/AppFilter";
 import ComponentsAdminTablePagination from '@/components/admin/table/pagination.vue';
+import { useAdminTitle } from "~/composables/useAdminTitle";
+
+useAdminTitle('Users management');
 </script>
 
 <script>
 import axios from "axios";
+import { useErrorStore } from "~/store/error.store";
 
 export default {
     setup() {
@@ -87,8 +86,8 @@ export default {
             await axios.get(`/api/admin/user?page=${this.page}&limit=${this.limit}`).then((res) => {
                 this.items = res.data.items;
                 this.count = res.data.count;
-            }).catch((err) => {
-
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             });

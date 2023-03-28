@@ -36,14 +36,15 @@
 </template>
 
 <script setup>
+import { useAdminTitle } from "~/composables/useAdminTitle";
+
+useAdminTitle('Login');
 definePageMeta({
     layout: "no-layout",
 });
 </script>
 
 <script>
-import { useToast } from "vue-toastification";
-import { useCookie, useRouter } from "#app";
 import axios from "axios";
 import { useErrorStore } from "~/store/error.store";
 import { useAuthStore } from "~/store/auth.store";

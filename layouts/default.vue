@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-app-bar :title="title.value">
+        <v-app-bar :title="title">
             <v-spacer></v-spacer>
 
             <v-btn v-for="menu in headers" :to="menu.slug">
@@ -17,19 +17,29 @@
 
         <v-footer app>
             <v-row justify="center" no-gutters>
-                <v-col md="12" class="mb-4">
-                    <v-divider></v-divider>
-                </v-col>
-
-                <v-col class="text-center mb-2">
-                    {{ new Date().getFullYear() }} — <strong>{{ title.value }}</strong>
+                <v-col class="text-center mb-2 mt-2">
+                    {{ new Date().getFullYear() }} — <strong>{{ title }}</strong>
                 </v-col>
             </v-row>
         </v-footer>
     </v-app>
 </template>
 
-<script setup>
-const { data: title } = await useFetch('/api/public/setting/title');
-const { data: headers } = await useFetch('/api/public/menu/header');
+<script>
+import { useSettingStore } from "~/store/setting.store";
+
+export default {
+    setup() {
+        const { data: headers } = useFetch('/api/public/menu/header');
+
+        return {
+            headers
+        }
+    },
+    computed: {
+        title() {
+            return useSettingStore().getTitle;
+        }
+    }
+}
 </script>

@@ -20,6 +20,9 @@ export const useAuthStore = defineStore('auth', {
         getUser: (state) => {
             return state.user;
         },
+        isAuthentificated: (state) => {
+            return state.user !== null && state.auth !== null;
+        }
     },
     actions: {
         login(res: AxiosResponse) {
@@ -36,15 +39,28 @@ export const useAuthStore = defineStore('auth', {
         async setUser() {
             await axios.get(`/api/admin/user/profile`).then((res) => {
                 this.user = res.data;
-            });
+            }).catch((err) => {
+                this.logout();
+            })
         },
-        logout() {
+        async logout() {
+            this.auth = null;
+            this.user = null;
+            await useRouter().push({path: '/admin/login'});
+        },
+        async refresh() {
+            this.auth = useCookie('auth');
 
-        },
-        refresh() {
-            this.setUser().then(async () => {
-                useToast().success(`Welcome back ${this.user?.username} !`);
-            });
+            if (!this.auth) {
+                await useRouter().push({path: '/admin/login'});
+                return;
+            }
+
+            if (!this.user) {
+                await this.setUser().then(async () => {
+                    useToast().success(`Welcome back ${this.user?.username} !`);
+                });
+            }
         }
     }
 });

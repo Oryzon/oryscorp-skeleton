@@ -1,8 +1,8 @@
 <template>
-    <v-app>
-        <v-app-bar color="blue-grey-darken-4" :title="'Administration - ' + title.value">
+    <v-app v-if="isAuthentificated">
+        <v-app-bar color="blue-grey-darken-4" :title="'Administration - ' + title">
             <template v-slot:append>
-                {{ user.username }}
+                {{ user?.username }}
 
                 <v-menu
                     v-model="menu"
@@ -56,10 +56,8 @@
 
         <v-footer app>
             <v-row justify="center" no-gutters>
-
-
                 <v-col class="text-center mb-2 mt-2">
-                    {{ new Date().getFullYear() }} — <strong>Administration - {{ title.value }}</strong>
+                    {{ new Date().getFullYear() }} — <strong>Administration - {{ title }}</strong>
                 </v-col>
             </v-row>
         </v-footer>
@@ -67,23 +65,12 @@
 </template>
 
 <script>
-import { useToast } from "vue-toastification";
-import { useCookie, useRouter, useState } from "#app";
-import { useErrorStore } from "~/store/error.store";
 import { useAuthStore } from "~/store/auth.store";
+import { useSettingStore } from "~/store/setting.store";
 
 export default {
     setup() {
-        const needRefresh = useState('need-refresh', () => false);
-
-        const { data: title, refresh } = useFetch('/api/public/setting/title');
         useAuthStore().refresh();
-
-        return {
-            needRefresh,
-            title,
-            refresh
-        }
     },
     data() {
         return {
@@ -122,30 +109,20 @@ export default {
             menu: false,
         }
     },
-    async mounted() {
-        await this.getInit();
-    },
     methods: {
-        async getInit() {
-
-        },
         logout() {
-
+            useAuthStore().logout();
         }
     },
     computed: {
         isAuthentificated() {
-            return true;
+            return useAuthStore().isAuthentificated;
         },
         user() {
             return useAuthStore().getUser;
-        }
-    },
-    watch: {
-        needRefresh(newVal) {
-            if (newVal) {
-                this.refresh();
-            }
+        },
+        title() {
+            return useSettingStore().getTitle;
         }
     }
 }

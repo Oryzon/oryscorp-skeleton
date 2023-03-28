@@ -44,15 +44,17 @@
 </template>
 
 <script setup>
+import { useAdminTitle } from "~/composables/useAdminTitle";
+
+useAdminTitle('Edit a page');
 definePageMeta({
     layout: "admin",
 });
 </script>
 
 <script>
-import { useRoute, useRouter } from "#app";
-import { useToast } from "vue-toastification";
 import axios from "axios";
+import { useErrorStore } from "~/store/error.store";
 
 export default {
     data() {
@@ -74,8 +76,8 @@ export default {
 
             await axios.get(`/api/admin/pages/${this.$route.params.uuid}`).then((res) => {
                 this.page = res.data;
-            }).catch((err) => {
-
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             })

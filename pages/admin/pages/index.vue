@@ -39,8 +39,14 @@
 
                                 <tr v-for="page in items">
                                     <td>{{ page.title }}</td>
-                                    <td>{{ page.state }}</td>
+
+                                    <td>
+                                        <span v-if="page.state"><v-icon color="success">mdi-check</v-icon></span>
+                                        <span v-else><v-icon color="error">mdi-close</v-icon></span>
+                                    </td>
+
                                     <td>{{ fDateTime(page.updatedAt ? page.updatedAt : page.createdAt) }}</td>
+
                                     <td>
                                         <v-btn
                                             color="primary"
@@ -50,6 +56,11 @@
                                         >
                                             <v-icon>mdi-pencil</v-icon>
                                         </v-btn>
+
+                                        <ComponentsAdminPageDelete
+                                            :page="page"
+                                            @updated="getInit"
+                                        ></ComponentsAdminPageDelete>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -72,10 +83,15 @@
 <script setup>
 import { fDateTime } from "~/models/AppFilter";
 import ComponentsAdminTablePagination from '@/components/admin/table/pagination.vue';
+import ComponentsAdminPageDelete from '@/components/admin/page/delete.vue';
+import { useAdminTitle } from "~/composables/useAdminTitle";
+
+useAdminTitle('Pages management');
 </script>
 
 <script>
 import axios from "axios";
+import { useErrorStore } from "~/store/error.store";
 
 export default {
     setup() {
@@ -102,8 +118,8 @@ export default {
             await axios.get(`/api/admin/pages?page=${this.page}&limit=${this.limit}`).then((res) => {
                 this.items = res.data.items;
                 this.count = res.data.count;
-            }).catch((err) => {
-
+            }).catch(async (err) => {
+                await useErrorStore().handle(err);
             }).finally(() => {
                 this.pending = false;
             });

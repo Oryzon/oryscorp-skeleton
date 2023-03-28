@@ -23,8 +23,6 @@ export const jwtCheckerHelper = async (event: H3Event) => {
             }
         });
     } catch (err: any) {
-        console.log(err);
-
         if (err instanceof jwt.TokenExpiredError) {
             throw createError({
                 statusCode: 401,

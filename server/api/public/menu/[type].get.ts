@@ -5,7 +5,8 @@ export default defineEventHandler(async (event) => {
 
     return prisma.menu.findMany({
         where: {
-            type: type
+            type: type,
+            state: true
         },
         orderBy: [
             { position: 'asc' }

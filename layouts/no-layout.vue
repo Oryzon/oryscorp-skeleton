@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-app-bar color="blue-grey-darken-4" class="text-center" :title="title.value"></v-app-bar>
+        <v-app-bar color="blue-grey-darken-4" class="text-center" :title="title"></v-app-bar>
 
         <v-main>
             <v-container fluid>
@@ -14,13 +14,32 @@
 
 
                 <v-col class="text-center mb-2 mt-2">
-                    {{ new Date().getFullYear() }} — <strong>{{ title.value }}</strong>
+                    {{ new Date().getFullYear() }} — <strong>{{ title }}</strong>
                 </v-col>
             </v-row>
         </v-footer>
     </v-app>
 </template>
 
-<script setup>
-const { data: title } = await useFetch('/api/public/setting/title');
+<script>
+import { useAuthStore } from "~/store/auth.store";
+import { useRouter, useRoute } from "#app";
+import { useSettingStore } from "~/store/setting.store";
+
+export default {
+    async setup() {
+        if (useRoute().path !== '/admin/register') {
+            await useAuthStore().refresh();
+        }
+
+        if (useAuthStore().isAuthentificated) {
+            await useRouter().push({path: '/admin/'});
+        }
+    },
+    computed: {
+        title() {
+            return useSettingStore().getTitle;
+        }
+    }
+}
 </script>
