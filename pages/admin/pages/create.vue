@@ -20,7 +20,14 @@
                             ></v-textarea>
                         </v-col>
 
-                        <v-col md="4" offset-md="8" class="mt-n6 mb-n6">
+                        <v-col md="4" offset-md="4" class="mt-n6 mb-n6">
+                            <v-text-field
+                                    label="Template"
+                                    v-model="entity.template"
+                            ></v-text-field>
+                        </v-col>
+
+                        <v-col md="4" class="mt-n6 mb-n6">
                             <v-select
                                 label="State"
                                 :items="[
@@ -66,6 +73,7 @@ export default {
                 title: '',
                 content: '',
                 state: '',
+                template: '',
             },
             pending: false,
         }
@@ -77,7 +85,8 @@ export default {
             await axios.post(`/api/admin/pages`, {
                 title: this.entity.title,
                 content: this.entity.content,
-                state: parseInt(this.entity.state)
+                state: parseInt(this.entity.state),
+                template: this.entity.template
             }).then((res) => {
                 useToast().success(res.data.message);
                 useRouter().push({path: '/admin/pages'});

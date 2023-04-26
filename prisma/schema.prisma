@@ -15,9 +15,9 @@ model Setting {
   key       String
   value     String
   createdAt DateTime @default(now())
-  createdBy String
-  updatedAt DateTime @updatedAt
-  updatedBy String
+  createdBy String?
+  updatedAt DateTime? @updatedAt
+  updatedBy String?
 }
 
 model Menu {
@@ -42,6 +42,7 @@ model Page {
   title     String
   content   String?
   state     Boolean   @default(false)
+  template  String?
   createdAt DateTime  @default(now())
   createdBy String
   updatedAt DateTime  @default(now()) @updatedAt

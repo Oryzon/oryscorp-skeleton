@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
                 title: body.title,
                 content: body.content,
                 state: !!body.state,
+                template: body.template,
                 createdBy: user.uuid,
             }
         });

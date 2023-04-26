@@ -17,7 +17,7 @@
                                 v-model="user.email"
                             ></v-text-field>
                         </v-col>
-                        
+
 
                         <v-col md="6" class="mt-n4">
                             <v-text-field
@@ -55,8 +55,6 @@ import axios from "axios";
 export default {
     setup() {
         const { data: canRegister } = useFetch('/api/public/setting/canRegister');
-
-        console.log(canRegister?.value);
 
         if (canRegister?.value.value === '0') {
             useToast().error("You can't create an account on this website.");

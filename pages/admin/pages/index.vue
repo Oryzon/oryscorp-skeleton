@@ -48,19 +48,19 @@
                                     <td>{{ fDateTime(page.updatedAt ? page.updatedAt : page.createdAt) }}</td>
 
                                     <td>
-                                        <v-btn
-                                            color="primary"
-                                            variant="text"
-                                            class="float-right"
-                                            :to="`/admin/pages/${page.uuid}`"
-                                        >
-                                            <v-icon>mdi-pencil</v-icon>
-                                        </v-btn>
-
                                         <ComponentsAdminPageDelete
                                             :page="page"
                                             @updated="getInit"
                                         ></ComponentsAdminPageDelete>
+
+                                        <v-btn
+                                                color="primary"
+                                                variant="text"
+                                                class="float-right"
+                                                :to="`/admin/pages/${page.uuid}`"
+                                        >
+                                            <v-icon>mdi-pencil</v-icon>
+                                        </v-btn>
                                     </td>
                                 </tr>
                                 </tbody>

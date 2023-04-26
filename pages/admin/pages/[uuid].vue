@@ -20,12 +20,19 @@
                             ></v-textarea>
                         </v-col>
 
-                        <v-col md="4" offset-md="8" class="mt-n6 mb-n6">
+                        <v-col md="4" offset-md="4" class="mt-n6 mb-n6">
+                            <v-text-field
+                                    label="Template"
+                                    v-model="page.template"
+                            ></v-text-field>
+                        </v-col>
+
+                        <v-col md="4" class="mt-n6 mb-n6">
                             <v-select
                                 label="State"
                                 :items="[
-                                    {title: 'Activated', value: true},
-                                    {title: 'Desactivated', value: false},
+                                    { title: 'Activated', value: true },
+                                    { title: 'Desactivated', value: false },
                                 ]"
                                 v-model="page.state"
                             ></v-select>

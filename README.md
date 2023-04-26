@@ -8,6 +8,7 @@ Some usefull command :
 - Run dev `npm run dev`
 - Init Prisma `npx prisma init`
 - Migration of Prisma (and generate Client) `npx prisma migrate dev --name init`
+- Seed the database (only the first time) : `npx prisma db seed`
 - Open Prisma Studio `npx prisma studio`
 
 Go for awesome project.
