@@ -88,6 +88,12 @@ export default {
                     to: '/admin/pages',
                 },
                 {
+                    title: 'Blocs CMS',
+                    icon: 'mdi-content-copy',
+                    color: 'deep-orange-accent-4',
+                    to: '/admin/bloc-cms',
+                },
+                {
                     title: 'Menus',
                     icon: 'mdi-menu',
                     color: 'green-darken-2',

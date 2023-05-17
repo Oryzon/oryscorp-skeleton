@@ -14,7 +14,7 @@ async function main() {
     const canRegister = await prisma.setting.create({
         data: {
             key: 'canRegister',
-            value: '',
+            value: '1',
             createdBy: '',
             updatedBy: ''
         }

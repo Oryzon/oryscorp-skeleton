@@ -2,44 +2,29 @@
     <v-row>
         <v-col md="12">
             <v-card :loading="pending">
-                <v-card-title>Create a new page</v-card-title>
+                <v-card-title>Create a new bloc CMS</v-card-title>
 
                 <v-card-text>
                     <v-row>
-                        <v-col md="12">
+                        <v-col md="6">
                             <v-text-field
                                 label="Title"
                                 v-model="entity.title"
                             ></v-text-field>
                         </v-col>
 
-                        <v-col md="12" class="mt-n6">
+                        <v-col md="6">
+                            <v-text-field
+                                label="Unique key"
+                                v-model="entity.key"
+                            ></v-text-field>
+                        </v-col>
+
+                        <v-col md="12">
                             <v-textarea
                                 label="Content"
                                 v-model="entity.content"
                             ></v-textarea>
-                        </v-col>
-
-                        <v-col md="4" class="mt-n6 mb-n6">
-                            <p v-text="'You can use bloc CMS if you add <%KEY_OF_THE_BLOC_CMS%> in the content.'"></p>
-                        </v-col>
-
-                        <v-col md="4" class="mt-n6 mb-n6">
-                            <v-text-field
-                                    label="Template"
-                                    v-model="entity.template"
-                            ></v-text-field>
-                        </v-col>
-
-                        <v-col md="4" class="mt-n6 mb-n6">
-                            <v-select
-                                label="State"
-                                :items="[
-                                    {title: 'Activated', value: 1},
-                                    {title: 'Desactivated', value: 0},
-                                ]"
-                                v-model="entity.state"
-                            ></v-select>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -57,7 +42,7 @@
 <script setup>
 import { useAdminTitle } from "~/composables/useAdminTitle";
 
-useAdminTitle('Create a page');
+useAdminTitle('Create a bloc CMS');
 definePageMeta({
     layout: "admin",
 });
@@ -75,9 +60,8 @@ export default {
             dialog: false,
             entity: {
                 title: '',
-                content: '',
-                state: '',
-                template: '',
+                key: '',
+                content: ''
             },
             pending: false,
         }
@@ -86,14 +70,13 @@ export default {
         async add() {
             this.pending = true;
 
-            await axios.post(`/api/admin/pages`, {
+            await axios.post(`/api/admin/bloc-cms`, {
                 title: this.entity.title,
-                content: this.entity.content,
-                state: parseInt(this.entity.state),
-                template: this.entity.template
+                key: this.entity.key,
+                content: this.entity.content
             }).then((res) => {
                 useToast().success(res.data.message);
-                useRouter().push({path: '/admin/pages'});
+                useRouter().push({path: '/admin/bloc-cms'});
             }).catch(async (err) => {
                 await useErrorStore().handle(err);
             }).finally(() => {

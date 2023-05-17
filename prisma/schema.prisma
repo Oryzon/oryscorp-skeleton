@@ -52,6 +52,19 @@ model Page {
   menus     Menu[]
 }
 
+model BlocCMS {
+    uuid    String  @id @default(uuid())
+    key     String @unique
+    title   String
+    content String?
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime  @default(now()) @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
 model User {
   uuid      String   @id @default(uuid())
   email     String   @unique

@@ -2,7 +2,7 @@
     <v-row>
         <v-col md="12">
             <Default
-                    v-if="item.page?.template === null"
+                    v-if="item.page?.template === null || item.page?.template === ''"
                     :page="item.page"
             ></Default>
 

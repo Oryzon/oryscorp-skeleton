@@ -4,9 +4,7 @@
             {{ page?.title }} (one-column)
         </v-card-title>
 
-        <v-card-text>
-            {{ page?.content }}
-        </v-card-text>
+        <v-card-text v-html="page?.content"></v-card-text>
     </v-card>
 </template>
 
