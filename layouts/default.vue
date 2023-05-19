@@ -5,7 +5,7 @@
                 <div class="flex lg:flex-1">
                     <a href="#" class="-m-1.5 p-1.5">
                         <span class="sr-only">{{ title }}</span>
-                        <img class="h-8 w-auto" src="logo-tmp.png"
+                        <img class="h-8 w-auto" src="logo-favicon.png"
                              alt="">
                     </a>
                 </div>
@@ -38,7 +38,7 @@
                         <a href="#" class="-m-1.5 p-1.5">
                             <span class="sr-only">{{ title }}</span>
                             <img class="h-8 w-auto"
-                                 src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="">
+                                 src="logo-favicon.png" alt="">
                         </a>
                         <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700">
                             <span class="sr-only">Close menu</span>
@@ -58,15 +58,39 @@
                 </div>
             </div>
         </header>
+
+        <div>
+            <NuxtPage>
+            </NuxtPage>
+        </div>
+
+        <footer class="pt-10">
+            <div class="max-w-screen-xl mx-auto px-4 text-gray-600 md:px-8 border-t mt-5 py-5">
+                <div class="space-y-6 sm:max-w-md sm:mx-auto sm:text-center">
+                    <img src="logo-and-name-inline.png" class="w-32 sm:mx-auto" />
+                </div>
+
+                <div class="mt-5 py-0 items-center justify-between sm:flex">
+                    <p>© {{ new Date().getFullYear() }} - {{ title }}. All rights reserved.</p>
+                    <ul class="flex flex-wrap items-center gap-4 mt-6 sm:text-sm sm:mt-0">
+                        <li class="text-gray-800 hover:text-gray-500 duration-150">
+                            <a>
+                                One Page
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
     </div>
 </template>
 
 <script>
-import {useSettingStore} from "~/store/setting.store";
+import { useSettingStore } from "~/store/setting.store";
 
 export default {
     setup() {
-        const {data: headers} = useFetch('/api/public/menu/header');
+        const { data: headers } = useFetch('/api/public/menu/header');
 
         return {
             headers

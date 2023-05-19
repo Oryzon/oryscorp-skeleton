@@ -1,5 +1,6 @@
 # OryScorp Skeleton
 A full skeleton of Nuxt 3 (Vue 3), Prisma, Vite configuration for HRM.
+Also, Vuetify JS for Admin and Tailwind CSS for Public
 Based on MySQL Database.
 
 Some usefull command :
@@ -12,3 +13,10 @@ Some usefull command :
 - Open Prisma Studio `npx prisma studio`
 
 Go for awesome project.
+
+### Need some help ?
+- https://www.floatui.com/components
+- https://www.prisma.io/
+- https://vuetifyjs.com/en/
+- https://nuxt.com/
+- https://vuejs.org/
